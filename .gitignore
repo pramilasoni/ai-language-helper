@@ -1,0 +1,47 @@
+# Virtual environment
+
+.env
+venv/
+node_modules/
+__pycache__/
+*.pyc
+audio_responses/
+temp_*
+.DS_Store
+
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+
+# Local data / debug
+data.json
+main-Copy1.py
+
+# ChromaDB
+chroma/
+chromadb/
+chroma_db/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temp files
+*~
