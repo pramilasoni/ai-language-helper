@@ -27,5 +27,7 @@ def process_request(
         "target_language": target_language,
         "result_text": agent_result.get("result_text"),
         "quality": agent_result.get("quality"),
-        "steps": agent_result.get("steps")
+        "steps": agent_result.get("steps"),
+            "trace": agent_result.get("trace")
+        
     }
