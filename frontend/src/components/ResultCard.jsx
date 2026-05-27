@@ -1,44 +1,91 @@
 function ResultCard({ result, loading }) {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://127.0.0.1:8000";
 
   return (
-    <div className="result-box">
-
+    <div className="result-card">
       <h3>AI Result</h3>
 
-      {loading && (
-        <p>Processing your audio...</p>
-      )}
+      {loading && <p>Processing your audio...</p>}
 
       {result && (
         <>
-          <div className="result-section">
+          <h4>Original Text</h4>
+          <p>{result.original_text || result.transcribed_text}</p>
 
-            <strong>Transcribed Text</strong>
+          <h4>Corrected Text</h4>
+          <p>{result.corrected_text}</p>
 
-            <p>{result.transcribed_text}</p>
+          {result.english_translation && (
+            <>
+              <h4>English Translation</h4>
+              <p>{result.english_translation}</p>
+            </>
+          )}
 
-          </div>
+          {result.translated_text && (
+            <>
+              <h4>Translation</h4>
+              <p>{result.translated_text}</p>
+            </>
+          )}
 
-          <div className="result-section">
+          {result.score !== undefined && (
+            <div className="score-container">
+              <div className="score-ring">
+                <svg width="140" height="140">
+                  <circle
+                    className="score-ring-bg"
+                    cx="70"
+                    cy="70"
+                    r="54"
+                  />
 
-            <strong>AI Response</strong>
+                  <circle
+                    className="score-ring-progress"
+                    cx="70"
+                    cy="70"
+                    r="54"
+                    style={{
+                      strokeDasharray: 339.3,
+                      strokeDashoffset:
+                        339.3 -
+                        (339.3 * result.score) / 100,
+                    }}
+                  />
+                </svg>
 
-            <p>
-              {result.response.result_text}
-            </p>
+                <div className="score-text">
+                  {result.score}
+                </div>
+              </div>
+            </div>
+          )}
 
-          </div>
+          {result.feedback && result.feedback.length > 0 && (
+            <>
+              <h4>Feedback</h4>
+              <ul>
+                {result.feedback.map((item, index) => (
+                  <li key={index}>
+                    <strong>{item.issue}</strong>:{" "}
+                    {item.suggestion}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
-          <audio
-            key={result.audio_response_url}
-            controls
-            autoPlay
-          >
-            <source
-              src={`${import.meta.env.VITE_API_BASE_URL}${result.audio_response_url}`}
-              type="audio/mpeg"
-            />
-          </audio>
+          {result.audio_response_url && (
+            <>
+              <h4>Audio</h4>
+              <audio
+                controls
+                src={`${API_BASE_URL}${result.audio_response_url}`}
+              />
+            </>
+          )}
         </>
       )}
     </div>

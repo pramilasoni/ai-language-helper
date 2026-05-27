@@ -1,34 +1,76 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://127.0.0.1:8000";
 
-
-export const processVoice = async (
+export async function processVoice(
   audioBlob,
   mode,
-  targetLanguage
-) => {
-
+  sourceLanguage,
+  targetLanguage,
+  practiceLanguage
+) {
   const formData = new FormData();
 
-  formData.append("file", audioBlob, "recording.webm");
-
-  formData.append("mode", mode);
-
-
-    if (mode === "translate" || mode === "auto") {
-      formData.append("target_language", targetLanguage);
-    }
-
-  const response = await axios.post(
-    `${API_BASE_URL}/voice-process`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+  formData.append(
+    "file",
+    audioBlob,
+    "recording.webm"
   );
 
-  return response.data;
-};
+  // -------------------------
+  // Translation Mode
+  // -------------------------
+  if (mode === "translation") {
+
+    formData.append(
+      "source_language",
+      sourceLanguage
+    );
+
+    formData.append(
+      "target_language",
+      targetLanguage
+    );
+
+    const response = await axios.post(
+      `${API_BASE_URL}/voice-translate`,
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  // -------------------------
+  // Perfection Mode
+  // -------------------------
+  if (mode === "perfection") {
+
+    formData.append(
+      "practice_language",
+      practiceLanguage
+    );
+
+    const response = await axios.post(
+      `${API_BASE_URL}/voice-perfect`,
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  throw new Error("Invalid mode");
+}

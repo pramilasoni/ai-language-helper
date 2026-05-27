@@ -1,12 +1,8 @@
 from config import (
-    OPENAI_API_KEY,
-    CHAT_MODEL,
     TTS_MODEL,
-    TTS_VOICE,
-    DEFAULT_TEMPERATURE
+    TTS_VOICE
 )
-from openai import OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY)
+from services.openai_client import client
 
 
 def generate_speech(text: str, output_file: str):

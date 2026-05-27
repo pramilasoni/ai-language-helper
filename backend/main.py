@@ -1,4 +1,4 @@
-import logging
+import glob
 import os
 import shutil
 import uuid
@@ -8,11 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from services.correction_service import correct_text
+from services.language_evaluator import evaluate_language
 from services.language_service import detect_language
-from services.translation_service import translate_text
 from services.orchestration_service import process_request
 from services.speech_service import transcribe_audio
+from services.translation_service import translate_text
 from services.tts_service import generate_speech
+from utils.logger import logger
 
 from schemas.request_schemas import (
     CorrectionRequest,
@@ -26,16 +28,23 @@ from schemas.response_schemas import (
     LanguageDetectionResponse,
     TranslationResponse,
     ProcessResponse,
-    VoiceProcessResponse,
     TranscriptionResponse,
+    VoiceTranslationResponse,
+    VoicePerfectionResponse,
 )
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+os.makedirs("audio_responses", exist_ok=True)
+
+for file_path in glob.glob("audio_responses/*.mp3"):
+    try:
+        os.remove(file_path)
+    except Exception:
+        pass
+
 
 app = FastAPI(
     title="AI Language Helper",
-    description="Voice-based AI app for correction and translation",
+    description="Voice-based AI app for correction, translation, and language perfection",
     version="1.0.0",
 )
 
@@ -59,10 +68,12 @@ app.mount(
 
 @app.get("/")
 def home():
-    return {
-        "message": "AI Language Helper API is running"
-    }
+    return {"message": "AI Language Helper API is running"}
 
+
+# -------------------------
+# Legacy text endpoints
+# -------------------------
 
 @app.post("/correct", response_model=CorrectionResponse)
 def correct_sentence(request: CorrectionRequest):
@@ -74,10 +85,7 @@ def correct_sentence(request: CorrectionRequest):
     }
 
 
-@app.post(
-    "/detect-language",
-    response_model=LanguageDetectionResponse,
-)
+@app.post("/detect-language", response_model=LanguageDetectionResponse)
 def detect_text_language(request: LanguageDetectionRequest):
     detected_language = detect_language(request.text)
 
@@ -120,6 +128,10 @@ def process_text(request: ProcessRequest):
     return response
 
 
+# -------------------------
+# Voice utility endpoint
+# -------------------------
+
 @app.post("/transcribe", response_model=TranscriptionResponse)
 def transcribe(file: UploadFile = File(...)):
     temp_file_path = f"temp_{uuid.uuid4()}_{file.filename}"
@@ -139,10 +151,17 @@ def transcribe(file: UploadFile = File(...)):
             os.remove(temp_file_path)
 
 
-@app.post("/voice-process", response_model=VoiceProcessResponse)
-def process_voice(
-    mode: str = Form(...),
-    target_language: str = Form(None),
+# -------------------------
+# New voice workflows
+# -------------------------
+
+@app.post(
+    "/voice-translate",
+    response_model=VoiceTranslationResponse,
+)
+def voice_translate(
+    source_language: str = Form(...),
+    target_language: str = Form(...),
     file: UploadFile = File(...),
 ):
     temp_file_path = f"temp_{uuid.uuid4()}_{file.filename}"
@@ -154,45 +173,108 @@ def process_voice(
         transcribed_text = transcribe_audio(temp_file_path)
 
         logger.info(
-            f"[VOICE FLOW] Transcribed text: {transcribed_text}"
+            f"[TRANSLATION FLOW] Source language: {source_language}"
+        )
+        logger.info(
+            f"[TRANSLATION FLOW] Target language: {target_language}"
+        )
+        logger.info(
+            f"[TRANSLATION FLOW] Transcribed text: {transcribed_text}"
         )
 
-        response = process_request(
-            text=transcribed_text,
-            mode=mode,
-            target_language=target_language,
+        corrected_text = correct_text(transcribed_text)
+
+        translated_text = translate_text(
+            corrected_text,
+            target_language,
         )
-
-        logger.info(f"[VOICE FLOW] Mode: {mode}")
-        logger.info(f"[VOICE FLOW] Workflow response: {response}")
-
-        if "error" in response:
-            raise HTTPException(
-                status_code=400,
-                detail=response,
-            )
-
-        result_text = response["result_text"]
 
         audio_filename = f"{uuid.uuid4()}.mp3"
         audio_output_path = f"audio_responses/{audio_filename}"
 
         generate_speech(
-            text=result_text,
+            text=translated_text,
             output_file=audio_output_path,
         )
 
         return {
-            "transcribed_text": transcribed_text,
-            "response": response,
+            "original_text": transcribed_text,
+            "corrected_text": corrected_text,
+            "translated_text": translated_text,
             "audio_response_url": f"/audio/{audio_filename}",
         }
 
-    except HTTPException:
-        raise
+    except Exception as e:
+        logger.error(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+    finally:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+
+@app.post(
+    "/voice-perfect",
+    response_model=VoicePerfectionResponse,
+)
+def voice_perfect(
+    practice_language: str = Form(...),
+    file: UploadFile = File(...),
+):
+    temp_file_path = f"temp_{uuid.uuid4()}_{file.filename}"
+
+    try:
+        with open(temp_file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        transcribed_text = transcribe_audio(temp_file_path)
+
+        logger.info(
+            f"[PERFECTION FLOW] Practice language: {practice_language}"
+        )
+        logger.info(
+            f"[PERFECTION FLOW] Transcribed text: {transcribed_text}"
+        )
+
+        evaluation = evaluate_language(
+            original_text=transcribed_text,
+            practice_language=practice_language,
+        )
+
+        logger.info(
+            f"[PERFECTION FLOW] Evaluation: {evaluation}"
+        )
+
+        corrected_text = evaluation["corrected_text"]
+        audio_url = None
+
+        if corrected_text.strip():
+            audio_filename = f"{uuid.uuid4()}.mp3"
+            audio_output_path = f"audio_responses/{audio_filename}"
+
+            generate_speech(
+                text=corrected_text,
+                output_file=audio_output_path,
+            )
+
+            audio_url = f"/audio/{audio_filename}"
+
+        return {
+            "original_text": transcribed_text,
+            "corrected_text": corrected_text,
+            "english_translation": evaluation["english_translation"],
+            "score": evaluation["score"],
+            "feedback": evaluation["feedback"],
+            "audio_response_url": audio_url,
+        }
 
     except Exception as e:
         logger.error(str(e))
+
         raise HTTPException(
             status_code=500,
             detail=str(e),

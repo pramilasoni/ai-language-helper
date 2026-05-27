@@ -1,12 +1,10 @@
-from openai import OpenAI
 
 from config import (
-    OPENAI_API_KEY,
     CHAT_MODEL,
     DEFAULT_TEMPERATURE
 )
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+from services.openai_client import client
 
 
 def detect_intent(text: str) -> str:
@@ -34,8 +32,15 @@ Return only the intent word.
     )
 
     return response.choices[0].message.content.strip().lower()
+    intent = (
+    response.choices[0]
+    .message
+    .content
+    .strip()
+    .lower()
+    )
+
     if intent not in ["correct", "translate"]:
-        
         return "correct"
 
     return intent

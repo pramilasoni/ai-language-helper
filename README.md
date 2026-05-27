@@ -1,244 +1,245 @@
-# AI Language Helper
+# 🚀 AI Language Helper
 
-## Overview
+AI Language Helper is a production-oriented AI-powered language learning assistant built with **React**, **FastAPI**, and **OpenAI APIs**.
 
-AI Language Helper is an agentic AI application that helps users improve communication through grammar correction, translation, and speech-based interactions.
+The application supports both text and voice workflows for:
 
-The system supports both text and voice input and uses a planner–executor–evaluator workflow to dynamically decide how language tasks should be processed.
+- 🎙️ Real-time voice translation
+- 🧠 AI-powered grammar correction
+- 📈 Language evaluation and scoring
+- 🔊 Text-to-speech audio generation
+- 🌍 Multi-language learning workflows
+- 🤖 Agentic AI orchestration patterns
 
-Instead of relying on a single LLM call, the application follows a multi-step orchestration approach where the system:
-
-1. Understands the user request
-2. Creates an execution plan
-3. Runs language tools step-by-step
-4. Evaluates output quality
-5. Re-plans when quality is insufficient
-6. Returns both text and audio responses
-
-This project was built to explore practical AI backend architecture patterns, agentic workflows, orchestration logic, and production-style service separation.
+This project was built to explore practical AI backend architecture, multimodal AI workflows, speech systems, orchestration logic, evaluation loops, and scalable service-oriented backend design.
 
 ---
 
-# Features
+# ✨ Features
 
-- Speech-to-text transcription using Whisper
-- Grammar and vocabulary correction
-- Text translation between languages
-- Combined correction + translation workflow
-- Automatic language detection
-- Planner-based AI orchestration
-- Tool execution pipeline
-- Output evaluation and retry loop
-- Text-to-speech audio responses
-- FastAPI backend architecture
-- React frontend interface
-- Modular service-based design
+## 🎧 Translation Mode
 
----
+Speak in one language and receive:
 
-# High-Level Architecture
+- Speech-to-text transcription
+- Grammar correction
+- Translation into another language
+- AI-generated translated audio response
+
+### Example Workflow
 
 ```text
-User Speech/Text
+Speech
+→ Whisper STT
+→ AI Correction
+→ AI Translation
+→ Text-to-Speech Audio
+```
+
+---
+
+## 🏆 Perfection Mode
+
+Practice speaking a language and receive:
+
+- Grammar correction
+- English meaning
+- AI evaluation score
+- Detailed improvement feedback
+- Corrected pronunciation audio
+
+### Example Workflow
+
+```text
+Speech
+→ Whisper STT
+→ AI Evaluation
+→ Grammar Correction
+→ English Translation
+→ Score + Feedback
+→ Corrected Audio
+```
+
+---
+
+# 🏗️ High-Level Architecture
+
+```text
+Frontend (React)
         ↓
-FastAPI API Endpoint
+FastAPI Backend
         ↓
-Whisper Transcription (optional)
+Speech-to-Text (Whisper)
         ↓
-Planner (LLM creates execution plan)
+AI Workflow Orchestration
+   ↙                ↘
+Translation Flow   Perfection Flow
         ↓
-Executor (runs tools step-by-step)
+OpenAI LLM
         ↓
-Evaluator (checks response quality)
-        ↓
-Re-planning if quality is low
-        ↓
-Final Response
+Structured JSON Responses
         ↓
 Text-to-Speech Generation
         ↓
-Audio Response Returned
+Frontend Audio Playback
 ```
 
 ---
 
-# Agentic AI Workflow
+# 🤖 Agentic AI Workflow
 
-The core idea behind this project is the use of an agentic architecture.
+The application follows a lightweight agentic architecture pattern.
 
-Instead of directly asking an LLM to generate the final answer in one step, the system separates the workflow into multiple stages:
+Instead of relying on a single LLM call, the backend separates execution into multiple stages:
 
-## 1. Planner
+1. Understand user intent
+2. Create execution flow
+3. Run language tools step-by-step
+4. Evaluate output quality
+5. Retry or improve when necessary
+6. Return both text and audio responses
 
-The planner receives the user request and creates a structured execution plan.
+This project explores practical AI orchestration patterns such as:
 
-Example:
-
-```json
-[
-  {
-    "tool": "correct_text",
-    "input": "I has a apple"
-  },
-  {
-    "tool": "translate_text",
-    "target_language": "Danish"
-  }
-]
-```
+- Planner–Executor workflows
+- Tool orchestration
+- Evaluation loops
+- Multi-step AI execution
+- Structured AI responses
+- Service-based AI architecture
 
 ---
 
-## 2. Executor
-
-The executor runs tools step-by-step.
-
-Example tools:
-
-- `correct_text`
-- `translate_text`
-- `detect_language`
-- `generate_speech`
-
-The output from one step becomes the input for the next step.
-
-Example:
+# 🧠 Translation Workflow
 
 ```text
-I has a apple
-→ I have an apple
-→ Jeg har et æble
+User Voice
+→ Speech Transcription
+→ Grammar Correction
+→ Translation
+→ Audio Generation
+→ Frontend Response
 ```
 
 ---
 
-## 3. Evaluator
+# 🧠 Perfection Workflow
 
-The evaluator reviews the final response quality.
-
-The system checks:
-
-- grammar quality
-- translation quality
-- response completeness
-- execution success
-
-A quality score is generated.
-
----
-
-## 4. Re-planning Loop
-
-If the quality score is below the threshold, the planner generates an improved execution plan and retries the workflow.
-
-This creates a lightweight autonomous AI execution loop.
+```text
+User Voice
+→ Speech Transcription
+→ Language Evaluation
+→ Grammar Analysis
+→ English Translation
+→ AI Scoring
+→ Feedback Generation
+→ Corrected Audio
+```
 
 ---
 
-# Tech Stack
+# 📁 Project Structure
+
+```text
+ai-language-helper/
+│
+├── backend/
+│   ├── main.py
+│   │
+│   ├── services/
+│   │   ├── correction_service.py
+│   │   ├── language_evaluator.py
+│   │   ├── language_service.py
+│   │   ├── openai_client.py
+│   │   ├── orchestration_service.py
+│   │   ├── planner_service.py
+│   │   ├── quality_service.py
+│   │   ├── speech_service.py
+│   │   ├── tool_agent_service.py
+│   │   ├── translation_service.py
+│   │   └── tts_service.py
+│   │
+│   ├── prompts/
+│   │   └── evaluation_prompt.py
+│   │
+│   ├── schemas/
+│   │   ├── request_schemas.py
+│   │   └── response_schemas.py
+│   │
+│   ├── utils/
+│   │   └── logger.py
+│   │
+│   ├── audio_responses/
+│   └── .env
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── api/
+│   │   └── App.jsx
+│
+└── README.md
+```
+
+---
+
+# ⚙️ Technologies Used
+
+## Frontend
+
+- React
+- Vite
+- Axios
+- CSS
+
+---
 
 ## Backend
 
 - Python
 - FastAPI
 - Pydantic
-- OpenAI API
-- Whisper
-
-## Frontend
-
-- React
-- Vite
-- JavaScript
-
-## AI Architecture Concepts
-
-- Agentic AI
-- Planner–Executor pattern
-- Evaluation loops
-- Tool orchestration
-- Service modularization
-- AI workflow orchestration
+- OpenAI SDK
 
 ---
 
-# Project Structure
+## AI & Speech
 
-```text
-backend/
-│
-├── providers/
-│   └── LLM and AI provider integrations
-│
-├── routers/
-│   └── FastAPI API endpoints
-│
-├── schemas/
-│   └── Pydantic request/response models
-│
-├── services/
-│   ├── orchestration_service.py
-│   ├── tool_agent_service.py
-│   ├── translation_service.py
-│   ├── correction_service.py
-│   ├── tts_service.py
-│   └── transcription_service.py
-│
-└── main.py
+- GPT-4o-mini
+- Whisper-1
+- OpenAI TTS
 
-frontend/
-│
-├── React UI
-├── Audio recording support
-└── API integration
+---
+
+# 🚀 Setup Instructions
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/pramilasoni/ai-language-helper.git
+
+cd ai-language-helper
 ```
 
 ---
 
-# API Flow Example
-
-## Input
-
-```json
-{
-  "text": "I has a apple",
-  "mode": "correct_translate",
-  "target_language": "Danish"
-}
-```
-
----
-
-## Internal Workflow
-
-```text
-1. Detect language
-2. Create execution plan
-3. Correct grammar
-4. Translate corrected text
-5. Evaluate quality
-6. Return final response
-```
-
----
-
-## Output
-
-```json
-{
-  "result_text": "Jeg har et æble"
-}
-```
-
----
-
-# Running the Project
-
-## Backend
+## 2. Backend Setup
 
 ```bash
 cd backend
+
 pip install -r requirements.txt
+```
+
+Create `.env`
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+```
+
+Run backend:
+
+```bash
 uvicorn main:app --reload
 ```
 
@@ -250,11 +251,13 @@ http://127.0.0.1:8000
 
 ---
 
-## Frontend
+## 3. Frontend Setup
 
 ```bash
 cd frontend
+
 npm install
+
 npm run dev
 ```
 
@@ -266,41 +269,163 @@ http://localhost:5173
 
 ---
 
-# Future Improvements
+# 🎯 API Endpoints
 
-Potential future enhancements:
+## Translation Workflow
 
-- Conversation memory
-- Session context handling
-- LangGraph integration
-- Streaming responses
-- Vector database memory
-- Multi-agent orchestration
-- Observability dashboards
-- User authentication
-- Persistent conversation history
-- Real-time speech streaming
+```text
+POST /voice-translate
+```
+
+### Input
+
+- source language
+- target language
+- audio file
+
+### Output
+
+- corrected text
+- translated text
+- translated audio
 
 ---
 
-# Learning Outcomes
+## Perfection Workflow
+
+```text
+POST /voice-perfect
+```
+
+### Input
+
+- practice language
+- audio file
+
+### Output
+
+- corrected text
+- English translation
+- language score
+- improvement feedback
+- corrected audio
+
+---
+
+# 📊 AI Evaluation Example
+
+## User Input
+
+```text
+Jeg gå til skole i går
+```
+
+---
+
+## AI Response
+
+### Corrected Text
+
+```text
+Jeg gik i skole i går
+```
+
+### English Translation
+
+```text
+I went to school yesterday
+```
+
+### Score
+
+```text
+82/100
+```
+
+### Feedback
+
+```text
+- Incorrect verb tense
+- Improved sentence structure
+```
+
+---
+
+# 🛠️ Production-Oriented Design Decisions
+
+This project intentionally follows production-style architecture principles:
+
+- Service-based backend organization
+- Centralized OpenAI client
+- Modular AI workflows
+- Structured request/response schemas
+- Voice workflow separation
+- Prompt modularization
+- Audio lifecycle management
+- AI evaluation pipelines
+- Environment-based configuration
+- Logging standardization
+- Multi-step orchestration logic
+
+---
+
+# 🚀 Future Improvements
+
+## AI Improvements
+
+- Pronunciation scoring
+- Conversation practice mode
+- Adaptive feedback
+- Session memory
+- Personalized learning paths
+
+---
+
+## Engineering Improvements
+
+- Docker deployment
+- Kubernetes deployment
+- Redis caching
+- CI/CD pipelines
+- Monitoring & observability
+- Rate limiting
+- Async processing
+- Persistent database storage
+- Streaming audio responses
+
+---
+
+# 📚 Learning Outcomes
 
 This project helped strengthen understanding of:
 
 - AI orchestration patterns
 - Agentic workflows
-- LLM planning strategies
-- Multi-step AI execution
-- FastAPI backend architecture
-- Service-based backend design
+- Multimodal AI systems
 - Speech-to-text pipelines
-- Text-to-speech integration
+- Text-to-speech generation
+- FastAPI backend architecture
+- Service-oriented backend design
 - Evaluation and retry loops
 - Production-style AI system design
+- Real-time AI workflow integration
 
 ---
 
-# Repository
+# 👨‍💻 Author
+
+Built by Pramila Soni as part of a hands-on AI engineering and solution architecture learning journey focused on:
+
+- AI applications
+- Agentic AI systems
+- LLM orchestration
+- Multimodal workflows
+- Cloud-native backend architecture
+- Production-ready AI system design
+
+---
+
+# 🔗 Repository
 
 GitHub Repository:
 

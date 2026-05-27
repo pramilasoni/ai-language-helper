@@ -1,10 +1,8 @@
 from config import (
-    OPENAI_API_KEY,
     CHAT_MODEL,
     DEFAULT_TEMPERATURE
 )
-from openai import OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY)
+from services.openai_client import client
 
 
 def translate_text(text: str, target_language: str):

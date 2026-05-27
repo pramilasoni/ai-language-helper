@@ -1,13 +1,5 @@
-import json
+
 import logging
-from openai import OpenAI
-
-from config import (
-    OPENAI_API_KEY,
-    CHAT_MODEL,
-    DEFAULT_TEMPERATURE
-)
-
 from services.language_service import detect_language
 from services.correction_service import correct_text
 from services.translation_service import translate_text
@@ -15,7 +7,7 @@ from services.quality_service import evaluate_response
 from services.planner_service import create_plan
 import json
 logger = logging.getLogger(__name__)
-client = OpenAI(api_key=OPENAI_API_KEY)
+
 
 
 tools = [

@@ -1,4 +1,35 @@
+from typing import List
 from pydantic import BaseModel
+
+# -------------------------
+# Voice workflow responses
+# -------------------------
+
+class FeedbackItem(BaseModel):
+    issue: str
+    suggestion: str
+
+
+class VoiceTranslationResponse(BaseModel):
+    original_text: str
+    corrected_text: str
+    translated_text: str
+    audio_response_url: str | None = None
+
+
+class VoicePerfectionResponse(BaseModel):
+    original_text: str
+    corrected_text: str
+    english_translation: str
+    score: int
+    feedback: List[FeedbackItem]
+    audio_response_url: str | None = None
+
+# -------------------------
+# Legacy response schemas
+# -------------------------
+
+
 
 
 class CorrectionResponse(BaseModel):
@@ -25,10 +56,6 @@ class ProcessResponse(BaseModel):
     target_language: str | None = None
 
 
-class VoiceProcessResponse(BaseModel):
-    transcribed_text: str
-    response: ProcessResponse
-    audio_response_url: str | None = None
     
 class TranscriptionResponse(BaseModel):
     transcribed_text: str

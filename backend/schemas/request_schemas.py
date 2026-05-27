@@ -1,5 +1,14 @@
-from enum import Enum
 from pydantic import BaseModel
+
+from enum import Enum
+class VoiceTranslationRequest(BaseModel):
+    source_language: str
+    target_language: str
+
+
+class VoicePerfectionRequest(BaseModel):
+    practice_language: str
+    translation_language: str
 
 
 class ProcessingMode(str, Enum):
